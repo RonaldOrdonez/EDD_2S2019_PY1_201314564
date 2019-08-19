@@ -1,4 +1,4 @@
-## Project 1
+## PROJECT 1 - PHOTGEN++
 ### Data Structure Course, Faculty of Engineering, USAC
 
 Developed by **Ronald G. Ordoñez X.**<br>
