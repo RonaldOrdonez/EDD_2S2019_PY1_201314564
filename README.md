@@ -10,10 +10,11 @@ Desktop application made with C ++, which consists of the generation of pixel im
 
 The app receives as a .CSV file which contains the name of the image as well as the different layers that compose it subsequently to the images you can apply default filters, generate reports of the data structures used for image manipulation and export the created image to an HTML file accompanied by your SCSS
 
-Data Structures Used:
-3-dimensional Sparse Matrix (cube)
-Binary Search Tree (ABB)
-Circular double linked list
-Simple Lists
-Queue
-Stack
+#### Data Structures Used:
+1) 3-dimensional Sparse Matrix (cube)
+2) Binary Search Tree (ABB)
+3) Circular double linked list
+4) Simple Lists
+5) Queue
+6) Stack
+
