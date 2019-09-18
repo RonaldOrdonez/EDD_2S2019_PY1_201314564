@@ -1,6 +1,7 @@
 #include <iostream>
 #include <stdlib.h>
 #include <string>
+#include <fstream>
 
 using namespace std;
 
@@ -380,6 +381,52 @@ class SparseMatrix
             }  
             cout<<"\n";            
         }
+
+        void graficarMatriz(){
+            NodeMatrix *tempCol = head;
+            NodeMatrix *tempRaw = head;
+            string rankSame ="{rank=same; CAPA"+to_string(tempCol->z);        
+            string scriptGraphviz ="digraph{\n rankdir=TB;\n node[shape=rectangle];\n graph[nodesep=0.5];\n\n";                      
+            scriptGraphviz+="CAPA"+to_string(tempCol->z);            
+            scriptGraphviz+="->";
+            
+            //Script que recorre las columnas para el dot
+            tempCol=tempCol->right;                       
+            while(tempCol->right != NULL)
+            {                
+                scriptGraphviz +="C"+to_string(tempCol->x);
+                rankSame+=" C"+to_string(tempCol->x);
+                scriptGraphviz +="[dir=both];\n";
+                scriptGraphviz +="C"+to_string(tempCol->x);
+                scriptGraphviz +="->";                
+                tempCol = tempCol->right;
+            }  
+            scriptGraphviz +="C"+to_string(tempCol->x);
+            scriptGraphviz +="[dir=both];\n";
+            rankSame+=" C"+to_string(tempCol->x);
+            rankSame+=" }\n\n";
+            scriptGraphviz+=rankSame; //concatena el script con la alineacion rankSame de las columnas
+            rankSame = "";
+
+            //Script que recorre las filas para le dot
+            scriptGraphviz+="CAPA"+to_string(tempRaw->z);
+            scriptGraphviz+="->";
+            tempRaw=tempRaw->down;
+            while(tempRaw->down != NULL)
+            {                
+                scriptGraphviz +="F"+to_string(tempRaw->y);
+                scriptGraphviz +="[dir=both];\n";
+                scriptGraphviz +="F"+to_string(tempRaw->y);
+                scriptGraphviz +="->";                
+                tempRaw = tempRaw->down;
+            } 
+            scriptGraphviz +="F"+to_string(tempRaw->y);
+            scriptGraphviz +="[dir=both];\n}"; //fin de recorrer las filas
+            ofstream myFile;
+            myFile.open("matrizDispersa.dot");
+            myFile<<scriptGraphviz;
+            myFile.close();            
+        }
 };
 
 /*****************************************************************************************************************
@@ -402,5 +449,6 @@ int main()
     cout<<"\n";
     cout<<"\n";
     matrix->printNodes();
+    matrix->graficarMatriz();
     return 0;
 }
