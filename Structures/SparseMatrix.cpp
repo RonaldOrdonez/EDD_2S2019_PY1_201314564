@@ -364,7 +364,7 @@ class SparseMatrix
                 cout<<temp->y;
                 cout<<"->";
                 while(temp->right!=NULL){
-                    cout<<"("<<temp->right->r <<"," <<temp->right->g <<","<< temp->right->b<<")";
+                    cout<<"("<<temp->right->x<<","<<temp->right->y<<"/"<<temp->right->r <<"," <<temp->right->g <<","<< temp->right->b<<")";
                     cout<<"->";
                     temp = temp->right;                    
                 }                   
@@ -375,22 +375,29 @@ class SparseMatrix
             cout<< temp->y;
             cout<<"->";
             while(temp->right!=NULL){
-                cout<<"("<<temp->right->r <<"," <<temp->right->g <<","<< temp->right->b<<")";
+                cout<<"("<<temp->right->x<<","<<temp->right->y<<"/"<<temp->right->r <<"," <<temp->right->g <<","<< temp->right->b<<")";
                 cout<<"->";
                 temp = temp->right;                    
             }  
             cout<<"\n";            
         }
+/*+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
++++++++++++++++++++++++++++++++++++++++++ GRAFICAR MATRIZ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 
         void graficarMatriz(){
             NodeMatrix *tempCol = head;
             NodeMatrix *tempRaw = head;
+            NodeMatrix *tempRawItera = head->down;               
+            NodeMatrix *tempColItera = head->right;
+
             string rankSame ="{rank=same; CAPA"+to_string(tempCol->z);        
             string scriptGraphviz ="digraph{\n rankdir=TB;\n node[shape=rectangle];\n graph[nodesep=0.5];\n\n";                      
             scriptGraphviz+="CAPA"+to_string(tempCol->z);            
             scriptGraphviz+="->";
-            
-            //Script que recorre las columnas para el dot
+            /*********************************************************************************************************************/
+            /*******************************Script que recorre las columnas para el dot*******************************************/
+            /*********************************************************************************************************************/
             tempCol=tempCol->right;                       
             while(tempCol->right != NULL)
             {                
@@ -407,8 +414,10 @@ class SparseMatrix
             rankSame+=" }\n\n";
             scriptGraphviz+=rankSame; //concatena el script con la alineacion rankSame de las columnas
             rankSame = "";
-
-            //Script que recorre las filas para le dot
+            
+            /*********************************************************************************************************************/
+            /********************************Script que recorre las filas para el dot*********************************************/
+            /*********************************************************************************************************************/
             scriptGraphviz+="CAPA"+to_string(tempRaw->z);
             scriptGraphviz+="->";
             tempRaw=tempRaw->down;
@@ -421,11 +430,106 @@ class SparseMatrix
                 tempRaw = tempRaw->down;
             } 
             scriptGraphviz +="F"+to_string(tempRaw->y);
-            scriptGraphviz +="[dir=both];\n}"; //fin de recorrer las filas
+            scriptGraphviz +="[dir=both];\n\n"; //fin de recorrer las filas
+
+            /*********************************************************************************************************************/
+            /************************************SCRIPT POR CADA FILA DE LA MATRIZ************************************************/
+            /*********************************************************************************************************************/
+            while(tempRawItera->down!=NULL)
+            {
+                scriptGraphviz+="F"+to_string(tempRawItera->y);
+                scriptGraphviz+="->";           
+                rankSame+="{rank=same; ";
+                rankSame+="F"+to_string(tempRawItera->y);                
+                //imprime las listas de cada fila
+                NodeMatrix *temp=tempRawItera->right;
+                while (temp->right!=NULL)
+                {
+                    scriptGraphviz+="N"+to_string(temp->x)+to_string(temp->y);
+                    scriptGraphviz+="[constraint=false,dir=both];\n";
+                    scriptGraphviz+="N"+to_string(temp->x)+to_string(temp->y)+"[label=\""+to_string(temp->r)+"-"+to_string(temp->g)+"-"+to_string(temp->b)+"\"];\n";
+                    scriptGraphviz+="N"+to_string(temp->x)+to_string(temp->y);
+                    scriptGraphviz+="->";
+                    rankSame+=" N"+to_string(temp->x)+to_string(temp->y);
+                    temp=temp->right;                    
+                }
+                scriptGraphviz+="N"+to_string(temp->x)+to_string(temp->y);
+                scriptGraphviz+="[constraint=false,dir=both];\n";
+                scriptGraphviz+="N"+to_string(temp->x)+to_string(temp->y)+"[label=\""+to_string(temp->r)+"-"+to_string(temp->g)+"-"+to_string(temp->b)+"\"];\n";                
+                rankSame+=" N"+to_string(temp->x)+to_string(temp->y);
+                rankSame+=" }\n";
+                scriptGraphviz+=rankSame+"\n";
+                rankSame="";
+
+                tempRawItera=tempRawItera->down;
+            }
+            scriptGraphviz+="F"+to_string(tempRawItera->y);
+            scriptGraphviz+="->";           
+            rankSame+="{rank=same; ";
+            rankSame+="F"+to_string(tempRawItera->y);                
+            //imprime las listas de cada fila
+            NodeMatrix *temp=tempRawItera->right;
+            while (temp->right!=NULL)
+            {
+                scriptGraphviz+="N"+to_string(temp->x)+to_string(temp->y);
+                scriptGraphviz+="[constraint=false,dir=both];\n";
+                scriptGraphviz+="N"+to_string(temp->x)+to_string(temp->y)+"[label=\""+to_string(temp->r)+"-"+to_string(temp->g)+"-"+to_string(temp->b)+"\"];\n";
+                scriptGraphviz+="N"+to_string(temp->x)+to_string(temp->y);
+                scriptGraphviz+="->";
+                rankSame+=" N"+to_string(temp->x)+to_string(temp->y);
+                temp=temp->right;                    
+            }
+            scriptGraphviz+="N"+to_string(temp->x)+to_string(temp->y);
+            scriptGraphviz+="[constraint=false,dir=both];\n";
+            scriptGraphviz+="N"+to_string(temp->x)+to_string(temp->y)+"[label=\""+to_string(temp->r)+"-"+to_string(temp->g)+"-"+to_string(temp->b)+"\"];\n";                
+            rankSame+=" N"+to_string(temp->x)+to_string(temp->y);
+            rankSame+=" }\n";
+            scriptGraphviz+=rankSame+"\n";            
+            rankSame="";  
+
+            /*********************************************************************************************************************/
+            /**********************************SCRIPT POR CADA COLUMNA DE LA MATRIZ***********************************************/
+            /*********************************************************************************************************************/
+
+            while(tempColItera->right!=NULL){
+                scriptGraphviz+="C"+to_string(tempColItera->x);
+                scriptGraphviz+="->";                           
+                NodeMatrix *temp=tempColItera->down;
+                while (temp->down!=NULL)
+                {
+                    scriptGraphviz+="N"+to_string(temp->x)+to_string(temp->y);
+                    scriptGraphviz+="[dir=both];\n";                    
+                    scriptGraphviz+="N"+to_string(temp->x)+to_string(temp->y);
+                    scriptGraphviz+="->";                    
+                    temp=temp->down;                    
+                }
+                scriptGraphviz+="N"+to_string(temp->x)+to_string(temp->y);
+                scriptGraphviz+="[dir=both];\n\n";                
+                tempColItera=tempColItera->right;
+            }
+            scriptGraphviz+="C"+to_string(tempColItera->x);
+            scriptGraphviz+="->";                           
+            NodeMatrix *temp_=tempColItera->down;
+            while (temp_->down!=NULL)
+            {
+                scriptGraphviz+="N"+to_string(temp_->x)+to_string(temp_->y);
+                scriptGraphviz+="[dir=both];\n";                    
+                scriptGraphviz+="N"+to_string(temp_->x)+to_string(temp_->y);
+                scriptGraphviz+="->";                    
+                temp_=temp_->down;                    
+            }                
+            scriptGraphviz+="N"+to_string(temp_->x)+to_string(temp_->y);
+            scriptGraphviz+="[dir=both];\n\n";                           
+            scriptGraphviz+="}";
             ofstream myFile;
             myFile.open("matrizDispersa.dot");
             myFile<<scriptGraphviz;
-            myFile.close();            
+            myFile.close();
+            const char* cmdCrear="dot -Tpng matrizDispersa.dot -o matrizDispersa.png";
+            const char* cmdExecute="cmd /c start matrizDispersa.png";
+            system(cmdCrear);
+            system(cmdExecute);
+
         }
 };
 
@@ -435,20 +539,37 @@ class SparseMatrix
 int main()
 {
     SparseMatrix *matrix = new SparseMatrix;
-    matrix->add(1,1,1,100,110,120);
-    matrix->add(2,2,1,101,111,121);
-    matrix->add(5,5,1,102,112,122);
-    matrix->add(4,4,1,103,113,123);
-    matrix->add(7,7,1,104,114,124);
+    matrix->add(2,3,1,153,204,255);
+    matrix->add(3,3,1,153,204,255);
+    matrix->add(4,3,1,153,204,255);
 
-    matrix->add(2,4,1,1,2,3);
-    matrix->add(2,7,1,5,6,7);
-    matrix->add(7,4,1,9,9,9);
-    matrix->add(5,1,1,6,6,6);
-    matrix->printHeaders();
-    cout<<"\n";
-    cout<<"\n";
-    matrix->printNodes();
+    matrix->add(2,4,1,153,204,255);
+    matrix->add(5,4,1,153,204,255);
+
+    matrix->add(2,5,1,153,204,255);
+    matrix->add(5,5,1,153,204,255);
+    
+    matrix->add(2,6,1,153,204,255);
+    matrix->add(5,6,1,153,204,255);
+    
+    matrix->add(2,7,1,153,204,255);
+    matrix->add(5,7,1,153,204,255);
+
+    matrix->add(2,8,1,153,204,255);
+    matrix->add(2,9,1,153,204,255);
+    matrix->add(2,10,1,153,204,255);
+    matrix->add(2,11,1,153,204,255);
+    matrix->add(2,12,1,153,204,255);
+
+    matrix->add(3,8,1,153,204,255);
+    matrix->add(4,8,1,153,204,255);
+    matrix->add(3,10,1,153,204,255);
+    matrix->add(4,11,1,153,204,255);
+    matrix->add(5,12,1,153,204,255);
+    //matrix->printHeaders();
+    //cout<<"\n";
+    //cout<<"\n";
+    //matrix->printNodes();
     matrix->graficarMatriz();
     return 0;
 }
